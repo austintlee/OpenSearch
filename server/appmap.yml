@@ -1,0 +1,24 @@
+name: OpenSearch
+packages:
+- path: config
+- path: extensions
+- path: google.protobuf
+- path: indices.analyze.conf_dir.hunspell.en_US
+- path: indices.analyze.conf_dir.hunspell.en_US_custom
+- path: indices.analyze.no_aff_conf_dir.hunspell.en_US
+- path: indices.analyze.two_aff_conf_dir.hunspell.en_US
+- path: indices.bwc
+- path: META-INF.services
+- path: mockito-extensions
+- path: org.apache.lucene.analysis.miscellaneous
+- path: org.apache.lucene.document
+- path: org.apache.lucene.index
+- path: org.apache.lucene.misc.search.similarity
+- path: org.apache.lucene.queries
+- path: org.apache.lucene.queryparser.classic
+- path: org.apache.lucene.search.grouping
+- path: org.apache.lucene.search.uhighlight
+- path: org.apache.lucene.search.vectorhighlight
+- path: org.apache.lucene.util
+- path: org.joda.time.format
+- path: org.opensearch

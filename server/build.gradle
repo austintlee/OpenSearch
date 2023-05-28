@@ -36,6 +36,7 @@ plugins {
   id('com.netflix.nebula.optional-base')
   id('opensearch.publish')
   id('opensearch.internal-cluster-test')
+  id('com.appland.appmap') version '1.1.1'
 }
 
 publishing {

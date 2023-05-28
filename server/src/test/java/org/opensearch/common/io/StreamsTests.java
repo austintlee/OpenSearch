@@ -33,6 +33,7 @@
 package org.opensearch.common.io;
 
 import org.apache.lucene.util.BytesRef;
+import org.junit.Test;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.test.OpenSearchTestCase;
@@ -68,6 +69,7 @@ public class StreamsTests extends OpenSearchTestCase {
         assertThat(out.toString(), equalTo(content));
     }
 
+    @Test
     public void testCopyFromString() throws IOException {
         String content = "content";
         StringWriter out = new StringWriter();
