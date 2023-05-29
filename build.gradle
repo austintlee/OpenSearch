@@ -57,6 +57,7 @@ plugins {
   id "org.gradle.test-retry" version "1.5.2" apply false
   id "test-report-aggregation"
   id 'jacoco-report-aggregation'
+  id 'com.appland.appmap' version '1.1.1'
 }
 
 apply from: 'gradle/build-complete.gradle'

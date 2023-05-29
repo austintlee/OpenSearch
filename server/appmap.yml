@@ -20,5 +20,6 @@ packages:
 - path: org.apache.lucene.search.uhighlight
 - path: org.apache.lucene.search.vectorhighlight
 - path: org.apache.lucene.util
+- path: org.apache.lucene.tests.util
 - path: org.joda.time.format
-- path: org.opensearch
+- path: org.opensearch.test
