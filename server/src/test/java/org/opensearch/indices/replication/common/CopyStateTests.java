@@ -13,6 +13,7 @@ import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexFileNames;
 import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.util.Version;
+import org.junit.Test;
 import org.opensearch.common.collect.Tuple;
 import org.opensearch.common.concurrent.GatedCloseable;
 import org.opensearch.index.codec.CodecService;
@@ -49,6 +50,7 @@ public class CopyStateTests extends IndexShardTestCase {
         0
     );
 
+    @Test
     public void testCopyStateCreation() throws IOException {
         final IndexShard mockIndexShard = createMockIndexShard();
         CopyState copyState = new CopyState(

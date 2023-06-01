@@ -9,6 +9,7 @@
 package org.opensearch.indices.replication;
 
 import org.junit.Assert;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.opensearch.OpenSearchException;
 import org.opensearch.Version;
@@ -143,6 +144,7 @@ public class SegmentReplicationTargetServiceTests extends IndexShardTestCase {
         super.tearDown();
     }
 
+    @Test
     public void testsSuccessfulReplication_listenerCompletes() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         sut.startReplication(replicaShard, new SegmentReplicationTargetService.SegmentReplicationListener() {

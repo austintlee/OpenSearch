@@ -374,6 +374,8 @@ tasks.named("licenseHeaders").configure {
 }
 
 tasks.test {
+    systemProperty 'tests.security.manager', 'false'
+    jvmArgs += ["-javaagent:/home/austinlee/opensearch/OpenSearch/appmap-agent-1.17.2.jar"]
     if (BuildParams.runtimeJavaVersion > JavaVersion.VERSION_1_8) {
         jvmArgs += ["--add-opens", "java.base/java.nio.file=ALL-UNNAMED"]
     }
