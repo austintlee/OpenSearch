@@ -67,9 +67,10 @@ public abstract class TestCluster implements Closeable {
     protected final Logger logger = LogManager.getLogger(getClass());
     private final long seed;
 
-    protected Random random;
+    protected Random random = new Random();
 
     public TestCluster(long seed) {
+        System.out.println("TestCluster ctor");
         this.seed = seed;
     }
 

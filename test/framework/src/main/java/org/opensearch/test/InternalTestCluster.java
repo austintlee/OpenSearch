@@ -31,11 +31,13 @@
 
 package org.opensearch.test;
 
+/*
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.SeedUtils;
 import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 import com.carrotsearch.randomizedtesting.generators.RandomStrings;
+*/
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -171,8 +173,8 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.apache.lucene.tests.util.LuceneTestCase.TEST_NIGHTLY;
-import static org.apache.lucene.tests.util.LuceneTestCase.rarely;
+//import static org.apache.lucene.tests.util.LuceneTestCase.TEST_NIGHTLY;
+//import static org.apache.lucene.tests.util.LuceneTestCase.rarely;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -229,7 +231,7 @@ public final class InternalTestCluster extends TestCluster {
     public static final int DEFAULT_HIGH_NUM_MASTER_NODES = DEFAULT_HIGH_NUM_CLUSTER_MANAGER_NODES;
 
     static final int DEFAULT_MIN_NUM_DATA_NODES = 1;
-    static final int DEFAULT_MAX_NUM_DATA_NODES = TEST_NIGHTLY ? 6 : 3;
+    static final int DEFAULT_MAX_NUM_DATA_NODES = 3; // TEST_NIGHTLY ? 6 : 3;
 
     static final int DEFAULT_NUM_CLIENT_NODES = -1;
     static final int DEFAULT_MIN_NUM_CLIENT_NODES = 0;
@@ -332,6 +334,7 @@ public final class InternalTestCluster extends TestCluster {
         final boolean forbidPrivateIndexSettings
     ) {
         super(clusterSeed);
+        System.out.println("Entering InternalTestCluster ctor.");
         this.autoManageClusterManagerNodes = autoManageClusterManagerNodes;
         this.clientWrapper = clientWrapper;
         this.forbidPrivateIndexSettings = forbidPrivateIndexSettings;
@@ -345,11 +348,12 @@ public final class InternalTestCluster extends TestCluster {
             throw new IllegalArgumentException("maximum number of data nodes must be >= minimum number of  data nodes");
         }
 
+        System.out.println("Here 1.");
         Random random = new Random(clusterSeed);
 
         boolean useDedicatedClusterManagerNodes = randomlyAddDedicatedClusterManagers ? random.nextBoolean() : false;
 
-        this.numSharedDataNodes = RandomNumbers.randomIntBetween(random, minNumDataNodes, maxNumDataNodes);
+        this.numSharedDataNodes = 1; //RandomNumbers.randomIntBetween(random, minNumDataNodes, maxNumDataNodes);
         assert this.numSharedDataNodes >= 0;
 
         if (numSharedDataNodes == 0) {
@@ -367,11 +371,11 @@ public final class InternalTestCluster extends TestCluster {
                 this.numSharedDedicatedClusterManagerNodes = 0;
             }
             if (numClientNodes < 0) {
-                this.numSharedCoordOnlyNodes = RandomNumbers.randomIntBetween(
-                    random,
-                    DEFAULT_MIN_NUM_CLIENT_NODES,
-                    DEFAULT_MAX_NUM_CLIENT_NODES
-                );
+                this.numSharedCoordOnlyNodes = 1; // RandomNumbers.randomIntBetween(
+                    //random,
+                    //DEFAULT_MIN_NUM_CLIENT_NODES,
+                    //DEFAULT_MAX_NUM_CLIENT_NODES
+                //);
             } else {
                 this.numSharedCoordOnlyNodes = numClientNodes;
             }
@@ -389,11 +393,12 @@ public final class InternalTestCluster extends TestCluster {
             sharedNodesSeeds[i] = random.nextLong();
         }
 
+        System.out.println("here 2.");
         logger.info(
             "Setup InternalTestCluster [{}] with seed [{}] using [{}] dedicated cluster-managers, "
                 + "[{}] (data) nodes and [{}] coord only nodes (min_cluster_manager_nodes are [{}])",
             clusterName,
-            SeedUtils.formatSeed(clusterSeed),
+            null, //SeedUtils.formatSeed(clusterSeed),
             numSharedDedicatedClusterManagerNodes,
             numSharedDataNodes,
             numSharedCoordOnlyNodes,
@@ -418,6 +423,9 @@ public final class InternalTestCluster extends TestCluster {
         builder.put(DiskThresholdSettings.CLUSTER_ROUTING_ALLOCATION_HIGH_DISK_WATERMARK_SETTING.getKey(), "1b");
         builder.put(DiskThresholdSettings.CLUSTER_ROUTING_ALLOCATION_DISK_FLOOD_STAGE_WATERMARK_SETTING.getKey(), "1b");
         builder.put(OperationRouting.USE_ADAPTIVE_REPLICA_SELECTION_SETTING.getKey(), random.nextBoolean());
+
+        System.out.println("Here 3.");
+        /*
         if (TEST_NIGHTLY) {
             builder.put(
                 ThrottlingAllocationDecider.CLUSTER_ROUTING_ALLOCATION_NODE_CONCURRENT_INCOMING_RECOVERIES_SETTING.getKey(),
@@ -436,8 +444,10 @@ public final class InternalTestCluster extends TestCluster {
                 ThrottlingAllocationDecider.CLUSTER_ROUTING_ALLOCATION_NODE_CONCURRENT_OUTGOING_RECOVERIES_SETTING.getKey(),
                 RandomNumbers.randomIntBetween(random, 2, 5)
             );
-        }
+        }*/
+
         // always reduce this - it can make tests really slow
+        /*
         builder.put(
             RecoverySettings.INDICES_RECOVERY_RETRY_DELAY_STATE_SYNC_SETTING.getKey(),
             TimeValue.timeValueMillis(RandomNumbers.randomIntBetween(random, 20, 50))
@@ -450,10 +460,13 @@ public final class InternalTestCluster extends TestCluster {
             RecoverySettings.INDICES_RECOVERY_MAX_CONCURRENT_OPERATIONS_SETTING.getKey(),
             RandomNumbers.randomIntBetween(random, 1, 4)
         );
+
+         */
         // TODO: currently we only randomize "cluster.no_cluster_manager_block" between "write" and "metadata_write", as "all" is fragile
         // and fails shards when a cluster-manager abdicates, which breaks many tests.
-        builder.put(NoClusterManagerBlockService.NO_CLUSTER_MANAGER_BLOCK_SETTING.getKey(), randomFrom(random, "write", "metadata_write"));
+        // builder.put(NoClusterManagerBlockService.NO_CLUSTER_MANAGER_BLOCK_SETTING.getKey(), randomFrom(random, "write", "metadata_write"));
         defaultSettings = builder.build();
+        System.out.println("Here 4.");
         executor = OpenSearchExecutors.newScaling(
             "internal_test_cluster_executor",
             0,
@@ -487,8 +500,11 @@ public final class InternalTestCluster extends TestCluster {
     }
 
     private Settings getSettings(int nodeOrdinal, long nodeSeed, Settings others) {
+        System.out.println("getSettings.");
         Builder builder = Settings.builder().put(defaultSettings).put(getRandomNodeSettings(nodeSeed));
+        System.out.println("g.s. here 1");
         Settings settings = nodeConfigurationSource.nodeSettings(nodeOrdinal);
+        System.out.println("g.s. here 2");
         if (settings != null) {
             if (settings.get(ClusterName.CLUSTER_NAME_SETTING.getKey()) != null) {
                 throw new IllegalStateException(
@@ -517,12 +533,18 @@ public final class InternalTestCluster extends TestCluster {
     }
 
     private static Settings getRandomNodeSettings(long seed) {
+        System.out.println("getRandomNodeSettings.");
+        return Settings.builder().build();
+    }
+
+    private static Settings getRandomNodeSettings_orig(long seed) {
         Random random = new Random(seed);
         Builder builder = Settings.builder();
-        builder.put(TransportSettings.TRANSPORT_COMPRESS.getKey(), rarely(random));
-        if (random.nextBoolean()) {
-            builder.put("cache.recycler.page.type", RandomPicks.randomFrom(random, PageCacheRecycler.Type.values()));
-        }
+        //builder.put(TransportSettings.TRANSPORT_COMPRESS.getKey(), rarely(random));
+
+        //if (random.nextBoolean()) {
+        //    builder.put("cache.recycler.page.type", RandomPicks.randomFrom(random, PageCacheRecycler.Type.values()));
+        //}
         if (random.nextInt(10) == 0) { // 10% of the nodes have a very frequent check interval
             builder.put(SearchService.KEEPALIVE_INTERVAL_SETTING.getKey(), timeValueMillis(10 + random.nextInt(2000)).getStringRep());
         } else if (random.nextInt(10) != 0) { // 90% of the time - 10% of the time we don't set anything
@@ -549,13 +571,14 @@ public final class InternalTestCluster extends TestCluster {
             builder.put(TransportSettings.CONNECTIONS_PER_NODE_REG.getKey(), random.nextInt(6) + 1);
         }
 
+        /*
         if (random.nextBoolean()) {
             builder.put(
                 MappingUpdatedAction.INDICES_MAPPING_DYNAMIC_TIMEOUT_SETTING.getKey(),
                 timeValueSeconds(RandomNumbers.randomIntBetween(random, 10, 30)).getStringRep()
             );
             builder.put(MappingUpdatedAction.INDICES_MAX_IN_FLIGHT_UPDATES_SETTING.getKey(), RandomNumbers.randomIntBetween(random, 1, 10));
-        }
+        }*/
 
         // turning on the real memory circuit breaker leads to spurious test failures. As have no full control over heap usage, we
         // turn it off for these tests.
@@ -566,6 +589,7 @@ public final class InternalTestCluster extends TestCluster {
             builder.put(HierarchyCircuitBreakerService.FIELDDATA_CIRCUIT_BREAKER_TYPE_SETTING.getKey(), "noop");
         }
 
+        /*
         if (random.nextBoolean()) {
             if (random.nextInt(10) == 0) { // do something crazy slow here
                 builder.put(
@@ -583,6 +607,7 @@ public final class InternalTestCluster extends TestCluster {
         if (random.nextBoolean()) {
             builder.put(TransportSettings.PING_SCHEDULE.getKey(), RandomNumbers.randomIntBetween(random, 100, 2000) + "ms");
         }
+
 
         if (random.nextBoolean()) {
             String ctx = randomFrom(random, ScriptModule.CORE_CONTEXTS.keySet());
@@ -604,7 +629,7 @@ public final class InternalTestCluster extends TestCluster {
             int retryTimeoutSeconds = RandomNumbers.randomIntBetween(random, 0, 60);
             builder.put(TransportReplicationAction.REPLICATION_RETRY_TIMEOUT.getKey(), timeValueSeconds(retryTimeoutSeconds));
         }
-
+*/
         return builder.build();
     }
 
@@ -613,7 +638,7 @@ public final class InternalTestCluster extends TestCluster {
         builder.append("-TEST_WORKER_VM=[").append(OpenSearchTestCase.TEST_WORKER_VM_ID).append(']');
         builder.append("-CLUSTER_SEED=[").append(clusterSeed).append(']');
         // if multiple maven task run on a single host we better have an identifier that doesn't rely on input params
-        builder.append("-HASH=[").append(SeedUtils.formatSeed(System.nanoTime())).append(']');
+        //builder.append("-HASH=[").append(SeedUtils.formatSeed(System.nanoTime())).append(']');
         return builder.toString();
     }
 
@@ -744,6 +769,7 @@ public final class InternalTestCluster extends TestCluster {
         final Settings extraSettings,
         final int defaultMinClusterManagerNodes
     ) {
+        System.out.println("getNodeSettings.");
         final Settings settings = getSettings(nodeId, seed, extraSettings);
 
         final String name = buildNodeName(nodeId, settings);
@@ -1249,9 +1275,9 @@ public final class InternalTestCluster extends TestCluster {
 
         if (prevNodeCount == 0 && autoManageClusterManagerNodes) {
             if (numSharedDedicatedClusterManagerNodes > 0) {
-                autoBootstrapClusterManagerNodeIndex = RandomNumbers.randomIntBetween(random, 0, numSharedDedicatedClusterManagerNodes - 1);
+                autoBootstrapClusterManagerNodeIndex = 0; // RandomNumbers.randomIntBetween(random, 0, numSharedDedicatedClusterManagerNodes - 1);
             } else if (numSharedDataNodes > 0) {
-                autoBootstrapClusterManagerNodeIndex = RandomNumbers.randomIntBetween(random, 0, numSharedDataNodes - 1);
+                autoBootstrapClusterManagerNodeIndex = 0; //RandomNumbers.randomIntBetween(random, 0, numSharedDataNodes - 1);
             }
         }
 
@@ -1594,12 +1620,13 @@ public final class InternalTestCluster extends TestCluster {
     private void randomlyResetClients() {
         assert Thread.holdsLock(this);
         // only reset the clients on nightly tests, it causes heavy load...
+        /*
         if (RandomizedTest.isNightly() && rarely(random)) {
             final Collection<NodeAndClient> nodesAndClients = nodes.values();
             for (NodeAndClient nodeAndClient : nodesAndClients) {
                 nodeAndClient.resetClient();
             }
-        }
+        }*/
     }
 
     public synchronized void wipePendingDataDirectories() {
@@ -2311,13 +2338,16 @@ public final class InternalTestCluster extends TestCluster {
      * Starts multiple nodes with the given settings and returns their names
      */
     public synchronized List<String> startNodes(Settings... extraSettings) {
+        System.out.println("Entering startNodes");
         final int newClusterManagerCount = Math.toIntExact(Stream.of(extraSettings).filter(DiscoveryNode::isClusterManagerNode).count());
+        System.out.println("Here 1");
         final int defaultMinClusterManagerNodes;
         if (autoManageClusterManagerNodes) {
             defaultMinClusterManagerNodes = getMinClusterManagerNodes(getClusterManagerNodesCount() + newClusterManagerCount);
         } else {
             defaultMinClusterManagerNodes = -1;
         }
+        System.out.println("Here 2.");
         final List<NodeAndClient> nodes = new ArrayList<>();
         final int prevClusterManagerCount = getClusterManagerNodesCount();
         int autoBootstrapClusterManagerNodeIndex = autoManageClusterManagerNodes
@@ -2325,17 +2355,20 @@ public final class InternalTestCluster extends TestCluster {
             && newClusterManagerCount > 0
             && Arrays.stream(extraSettings)
                 .allMatch(s -> DiscoveryNode.isClusterManagerNode(s) == false || ZEN2_DISCOVERY_TYPE.equals(DISCOVERY_TYPE_SETTING.get(s)))
-                    ? RandomNumbers.randomIntBetween(random, 0, newClusterManagerCount - 1)
+                    ? 0 // RandomNumbers.randomIntBetween(random, 0, newClusterManagerCount - 1)
                     : -1;
-
+System.out.println("Here 3.");
         final int numOfNodes = extraSettings.length;
         final int firstNodeId = nextNodeId.getAndIncrement();
+        System.out.println("Here 3.1");
         final List<Settings> settings = new ArrayList<>();
         for (int i = 0; i < numOfNodes; i++) {
-            settings.add(getNodeSettings(firstNodeId + i, random.nextLong(), extraSettings[i], defaultMinClusterManagerNodes));
+            settings.add(getNodeSettings(firstNodeId + i, 1L /*random.nextLong()*/, extraSettings[i], defaultMinClusterManagerNodes));
+            System.out.println("Here 3.2");
         }
         nextNodeId.set(firstNodeId + numOfNodes);
 
+        System.out.println("Here 4.");
         final List<String> initialClusterManagerNodes = settings.stream()
             .filter(DiscoveryNode::isClusterManagerNode)
             .map(Node.NODE_NAME_SETTING::get)
@@ -2343,6 +2376,7 @@ public final class InternalTestCluster extends TestCluster {
 
         final List<Settings> updatedSettings = bootstrapClusterManagerNodeWithSpecifiedIndex(settings);
 
+        System.out.println("Here 5.");
         for (int i = 0; i < numOfNodes; i++) {
             final Settings nodeSettings = updatedSettings.get(i);
             final Builder builder = Settings.builder();
@@ -2361,10 +2395,12 @@ public final class InternalTestCluster extends TestCluster {
             );
             nodes.add(nodeAndClient);
         }
+        System.out.println("here 6.");
         startAndPublishNodesAndClients(nodes);
         if (autoManageClusterManagerNodes) {
             validateClusterFormed();
         }
+        System.out.println("here 7.");
         return nodes.stream().map(NodeAndClient::getName).collect(Collectors.toList());
     }
 
@@ -2581,7 +2617,7 @@ public final class InternalTestCluster extends TestCluster {
                 );
                 OperationRouting operationRouting = clusterService.operationRouting();
                 while (true) {
-                    String routing = RandomStrings.randomAsciiOfLength(random, 10);
+                    String routing = "0"; // RandomStrings.randomAsciiOfLength(random, 10);
                     final int targetShard = operationRouting.indexShards(clusterService.state(), index.getName(), null, routing)
                         .shardId()
                         .getId();

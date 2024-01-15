@@ -31,6 +31,7 @@ import org.opensearch.gradle.info.BuildParams
 
 apply plugin: 'opensearch.build'
 apply plugin: 'opensearch.publish'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
   api project(":client:rest")

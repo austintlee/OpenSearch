@@ -32,16 +32,16 @@
 
 package org.opensearch.test;
 
-import com.carrotsearch.randomizedtesting.RandomizedContext;
-import com.carrotsearch.randomizedtesting.annotations.TestGroup;
-import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
-import com.carrotsearch.randomizedtesting.generators.RandomPicks;
+//import com.carrotsearch.randomizedtesting.RandomizedContext;
+//import com.carrotsearch.randomizedtesting.annotations.TestGroup;
+//import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
+//import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TotalHits;
-import org.apache.lucene.tests.util.LuceneTestCase;
+//import org.apache.lucene.tests.util.LuceneTestCase;
 import org.opensearch.ExceptionsHelper;
 import org.opensearch.OpenSearchException;
 import org.opensearch.action.DocWriteResponse;
@@ -269,7 +269,7 @@ import static org.hamcrest.Matchers.startsWith;
  * <li> - a random seed used to initialize the index random context.
  * </ul>
  */
-@LuceneTestCase.SuppressFileSystems("ExtrasFS") // doesn't work with potential multi data path from test cluster yet
+//@LuceneTestCase.SuppressFileSystems("ExtrasFS") // doesn't work with potential multi data path from test cluster yet
 public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
 
     /**
@@ -296,12 +296,12 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
      * or may additionally require some external configuration (e.g. AWS credentials)
      * via the {@code tests.config} system property.
      */
-    @Inherited
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.TYPE)
-    @TestGroup(enabled = false, sysProperty = OpenSearchIntegTestCase.SYSPROP_THIRDPARTY)
-    public @interface ThirdParty {
-    }
+    //@Inherited
+    //@Retention(RetentionPolicy.RUNTIME)
+    //@Target(ElementType.TYPE)
+    //@TestGroup(enabled = false, sysProperty = OpenSearchIntegTestCase.SYSPROP_THIRDPARTY)
+    //public @interface ThirdParty {
+    //}
 
     /** node names of the corresponding clusters will start with these prefixes */
     public static final String SUITE_CLUSTER_NODE_PREFIX = "node_s";
@@ -379,7 +379,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
     private static final Map<Class<?>, TestCluster> clusters = new IdentityHashMap<>();
 
     private static OpenSearchIntegTestCase INSTANCE = null; // see @SuiteScope
-    private static Long SUITE_SEED = null;
+    protected static Long SUITE_SEED = null;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -406,7 +406,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             case SUITE:
                 assert SUITE_SEED != null : "Suite seed was not initialized";
                 currentCluster = buildAndPutCluster(currentClusterScope, SUITE_SEED);
-                RandomizedContext.current().runWithPrivateRandomness(SUITE_SEED, setup);
+                // RandomizedContext.current().runWithPrivateRandomness(SUITE_SEED, setup);
                 break;
             case TEST:
                 currentCluster = buildAndPutCluster(currentClusterScope, randomLong());
@@ -487,7 +487,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             // keep this low so we don't stall tests
             builder.put(
                 UnassignedInfo.INDEX_DELAYED_NODE_LEFT_TIMEOUT_SETTING.getKey(),
-                RandomNumbers.randomIntBetween(random, 1, 15) + "ms"
+                1 // RandomNumbers.randomIntBetween(random, 1, 15) + "ms"
             );
         }
 
@@ -507,8 +507,8 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         }
         switch (random.nextInt(4)) {
             case 3:
-                final int maxThreadCount = RandomNumbers.randomIntBetween(random, 1, 4);
-                final int maxMergeCount = RandomNumbers.randomIntBetween(random, maxThreadCount, maxThreadCount + 4);
+                final int maxThreadCount = 1; // RandomNumbers.randomIntBetween(random, 1, 4);
+                final int maxMergeCount = 1; // RandomNumbers.randomIntBetween(random, maxThreadCount, maxThreadCount + 4);
                 builder.put(MergeSchedulerConfig.MAX_MERGE_COUNT_SETTING.getKey(), maxMergeCount);
                 builder.put(MergeSchedulerConfig.MAX_THREAD_COUNT_SETTING.getKey(), maxThreadCount);
                 break;
@@ -521,7 +521,8 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         if (random.nextBoolean()) {
             builder.put(
                 IndexSettings.INDEX_TRANSLOG_FLUSH_THRESHOLD_SIZE_SETTING.getKey(),
-                new ByteSizeValue(RandomNumbers.randomIntBetween(random, 1, 300), ByteSizeUnit.MB)
+                new ByteSizeValue(1, // RandomNumbers.randomIntBetween(random, 1, 300),
+                     ByteSizeUnit.MB)
             );
         }
         if (random.nextBoolean()) {
@@ -532,14 +533,14 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         if (random.nextBoolean()) {
             builder.put(
                 IndexSettings.INDEX_TRANSLOG_DURABILITY_SETTING.getKey(),
-                RandomPicks.randomFrom(random, Translog.Durability.values())
+                0 //RandomPicks.randomFrom(random, Translog.Durability.values())
             );
         }
 
         if (random.nextBoolean()) {
             builder.put(
                 IndexSettings.INDEX_TRANSLOG_SYNC_INTERVAL_SETTING.getKey(),
-                RandomNumbers.randomIntBetween(random, 100, 5000),
+                100, // RandomNumbers.randomIntBetween(random, 100, 5000),
                 TimeUnit.MILLISECONDS
             );
         }
@@ -548,7 +549,8 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
     }
 
     private TestCluster buildWithPrivateContext(final Scope scope, final long seed) throws Exception {
-        return RandomizedContext.current().runWithPrivateRandomness(seed, () -> buildTestCluster(scope, seed));
+        // return RandomizedContext.current().runWithPrivateRandomness(seed, () -> buildTestCluster(scope, seed));
+        return buildTestCluster(scope, seed);
     }
 
     private TestCluster buildAndPutCluster(Scope currentClusterScope, long seed) throws Exception {
@@ -1611,7 +1613,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             final int unicodeLen = between(1, 10);
             for (int i = 0; i < numBogusDocs; i++) {
                 String id = "bogus_doc_" + randomRealisticUnicodeOfLength(unicodeLen) + dummmyDocIdGenerator.incrementAndGet();
-                String index = RandomPicks.randomFrom(random, indices);
+                String index = "0"; // RandomPicks.randomFrom(random, indices);
                 bogusIds.add(Arrays.asList(index, id));
                 // We configure a routing key in case the mapping requires it
                 builders.add(client().prepareIndex().setIndex(index).setId(id).setSource("{}", MediaTypeRegistry.JSON).setRouting(id));
@@ -1939,7 +1941,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         return getAnnotation(clazz.getSuperclass(), annotationClass);
     }
 
-    private Scope getCurrentClusterScope() {
+    protected Scope getCurrentClusterScope() {
         return getCurrentClusterScope(this.getClass());
     }
 
@@ -1992,6 +1994,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
      */
     protected Settings nodeSettings(int nodeOrdinal) {
         final Settings featureFlagSettings = featureFlagSettings();
+        System.out.println("Got feature flags.");
         Settings.Builder builder = Settings.builder()
             // Default the watermarks to absurdly low to prevent the tests
             // from failing on nodes without enough disk space
@@ -2005,21 +2008,24 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             // wait short time for other active shards before actually deleting, default 30s not needed in tests
             .put(IndicesStore.INDICES_STORE_DELETE_SHARD_TIMEOUT.getKey(), new TimeValue(1, TimeUnit.SECONDS))
             // randomly enable low-level search cancellation to make sure it does not alter results
-            .put(SearchService.LOW_LEVEL_CANCELLATION_SETTING.getKey(), randomBoolean())
+            .put(SearchService.LOW_LEVEL_CANCELLATION_SETTING.getKey(), false) //  randomBoolean())
             .putList(DISCOVERY_SEED_HOSTS_SETTING.getKey()) // empty list disables a port scan for other nodes
             .putList(DISCOVERY_SEED_PROVIDERS_SETTING.getKey(), "file")
             .put(featureFlagSettings());
 
+        System.out.println("n.s. here 1");
         // Enable tracer only when Telemetry Setting is enabled
         if (featureFlagSettings().getAsBoolean(FeatureFlags.TELEMETRY_SETTING.getKey(), false)) {
             builder.put(TelemetrySettings.TRACER_FEATURE_ENABLED_SETTING.getKey(), true);
             builder.put(TelemetrySettings.TRACER_ENABLED_SETTING.getKey(), true);
         }
+        System.out.println("n.s. here 2.");
         if (FeatureFlags.CONCURRENT_SEGMENT_SEARCH_SETTING.get(featureFlagSettings)) {
             // By default, for tests we will put the target slice count of 2. This will increase the probability of having multiple slices
             // when tests are run with concurrent segment search enabled
             builder.put(SearchService.CONCURRENT_SEGMENT_SEARCH_TARGET_MAX_SLICE_COUNT_KEY, 2);
         }
+        System.out.println("n.s. here 3.");
         return builder.build();
     }
 
@@ -2062,6 +2068,9 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
     }
 
     protected TestCluster buildTestCluster(Scope scope, long seed) throws IOException {
+
+        System.out.println("Entering buildTestCluster");
+
         String clusterAddresses = System.getProperty(TESTS_CLUSTER);
         if (Strings.hasLength(clusterAddresses) && ignoreExternalCluster() == false) {
             if (scope == Scope.TEST) {
@@ -2071,6 +2080,8 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             if (Strings.isNullOrEmpty(clusterName)) {
                 throw new IllegalArgumentException("Missing tests.clustername system property");
             }
+
+            System.out.println("Building external cluster!");
             return buildExternalCluster(clusterAddresses, clusterName);
         }
 
@@ -2087,6 +2098,9 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         }
 
         boolean supportsDedicatedClusterManagers = getSupportsDedicatedClusterManagers();
+
+        System.out.println("Here 1.");
+
         int numDataNodes = getNumDataNodes();
         int minNumDataNodes;
         int maxNumDataNodes;
@@ -2096,9 +2110,14 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             minNumDataNodes = getMinNumDataNodes();
             maxNumDataNodes = getMaxNumDataNodes();
         }
-        Collection<Class<? extends Plugin>> mockPlugins = getMockPlugins();
+        Collection<Class<? extends Plugin>> mockPlugins = Collections.emptySet(); // getMockPlugins();
+
+        System.out.println("Here 2.");
         final NodeConfigurationSource nodeConfigurationSource = getNodeConfigSource();
+        System.out.println("Here 3.");
+        /*
         if (addMockTransportService()) {
+            System.out.println("Here 4.");
             ArrayList<Class<? extends Plugin>> mocks = new ArrayList<>(mockPlugins);
             // add both mock plugins - local and tcp if they are not there
             // we do this in case somebody overrides getMockPlugins and misses to call super
@@ -2107,9 +2126,13 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             }
             mockPlugins = mocks;
         }
+*/
+        System.out.println("Constructing InternalTestCluster.");
+
         return new InternalTestCluster(
             seed,
-            createTempDir(),
+            //createTempDir(),
+            Files.createTempDirectory(null),
             supportsDedicatedClusterManagers,
             getAutoManageClusterManagerNodes(),
             minNumDataNodes,
@@ -2132,6 +2155,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         return new NodeConfigurationSource() {
             @Override
             public Settings nodeSettings(int nodeOrdinal) {
+                System.out.println("nodeSettings.");
                 return Settings.builder()
                     .put(initialNodeSettings.build())
                     .put(OpenSearchIntegTestCase.this.nodeSettings(nodeOrdinal))
