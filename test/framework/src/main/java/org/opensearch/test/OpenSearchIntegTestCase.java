@@ -533,7 +533,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
         if (random.nextBoolean()) {
             builder.put(
                 IndexSettings.INDEX_TRANSLOG_DURABILITY_SETTING.getKey(),
-                0 //RandomPicks.randomFrom(random, Translog.Durability.values())
+                Translog.Durability.REQUEST //RandomPicks.randomFrom(random, Translog.Durability.values())
             );
         }
 
@@ -2110,12 +2110,12 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             minNumDataNodes = getMinNumDataNodes();
             maxNumDataNodes = getMaxNumDataNodes();
         }
-        Collection<Class<? extends Plugin>> mockPlugins = Collections.emptySet(); // getMockPlugins();
+        Collection<Class<? extends Plugin>> mockPlugins = getMockPlugins();
 
         System.out.println("Here 2.");
         final NodeConfigurationSource nodeConfigurationSource = getNodeConfigSource();
         System.out.println("Here 3.");
-        /*
+
         if (addMockTransportService()) {
             System.out.println("Here 4.");
             ArrayList<Class<? extends Plugin>> mocks = new ArrayList<>(mockPlugins);
@@ -2126,7 +2126,9 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             }
             mockPlugins = mocks;
         }
-*/
+
+        // mockPlugins.add(MockHttpTransport.TestPlugin.class);
+
         System.out.println("Constructing InternalTestCluster.");
 
         return new InternalTestCluster(

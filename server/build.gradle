@@ -38,8 +38,6 @@ plugins {
   id('opensearch.optional-dependencies')
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
-
 publishing {
   publications {
     nebula(MavenPublication) {

@@ -31,13 +31,13 @@
 
 package org.opensearch.test;
 
-/*
+
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.SeedUtils;
 import com.carrotsearch.randomizedtesting.generators.RandomNumbers;
 import com.carrotsearch.randomizedtesting.generators.RandomPicks;
 import com.carrotsearch.randomizedtesting.generators.RandomStrings;
-*/
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -532,11 +532,27 @@ public final class InternalTestCluster extends TestCluster {
         return plugins;
     }
 
+    /*
+    static class Random {
+        public Random(long seed) {
+
+        }
+
+        public int nextInt(int max) {
+            return max - 1;
+        }
+
+        public boolean nextBoolean() {
+            return false;
+        }
+    }*/
+
     private static Settings getRandomNodeSettings(long seed) {
         System.out.println("getRandomNodeSettings.");
         return Settings.builder().build();
     }
 
+    /*
     private static Settings getRandomNodeSettings_orig(long seed) {
         Random random = new Random(seed);
         Builder builder = Settings.builder();
@@ -571,14 +587,14 @@ public final class InternalTestCluster extends TestCluster {
             builder.put(TransportSettings.CONNECTIONS_PER_NODE_REG.getKey(), random.nextInt(6) + 1);
         }
 
-        /*
+
         if (random.nextBoolean()) {
             builder.put(
                 MappingUpdatedAction.INDICES_MAPPING_DYNAMIC_TIMEOUT_SETTING.getKey(),
                 timeValueSeconds(RandomNumbers.randomIntBetween(random, 10, 30)).getStringRep()
             );
             builder.put(MappingUpdatedAction.INDICES_MAX_IN_FLIGHT_UPDATES_SETTING.getKey(), RandomNumbers.randomIntBetween(random, 1, 10));
-        }*/
+        }
 
         // turning on the real memory circuit breaker leads to spurious test failures. As have no full control over heap usage, we
         // turn it off for these tests.
@@ -589,7 +605,7 @@ public final class InternalTestCluster extends TestCluster {
             builder.put(HierarchyCircuitBreakerService.FIELDDATA_CIRCUIT_BREAKER_TYPE_SETTING.getKey(), "noop");
         }
 
-        /*
+
         if (random.nextBoolean()) {
             if (random.nextInt(10) == 0) { // do something crazy slow here
                 builder.put(
@@ -629,16 +645,17 @@ public final class InternalTestCluster extends TestCluster {
             int retryTimeoutSeconds = RandomNumbers.randomIntBetween(random, 0, 60);
             builder.put(TransportReplicationAction.REPLICATION_RETRY_TIMEOUT.getKey(), timeValueSeconds(retryTimeoutSeconds));
         }
-*/
+
         return builder.build();
     }
+    */
 
     public static String clusterName(String prefix, long clusterSeed) {
         StringBuilder builder = new StringBuilder(prefix);
         builder.append("-TEST_WORKER_VM=[").append(OpenSearchTestCase.TEST_WORKER_VM_ID).append(']');
         builder.append("-CLUSTER_SEED=[").append(clusterSeed).append(']');
         // if multiple maven task run on a single host we better have an identifier that doesn't rely on input params
-        //builder.append("-HASH=[").append(SeedUtils.formatSeed(System.nanoTime())).append(']');
+        builder.append("-HASH=[").append(SeedUtils.formatSeed(System.nanoTime())).append(']');
         return builder.toString();
     }
 

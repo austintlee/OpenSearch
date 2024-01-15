@@ -8,10 +8,10 @@
 
 package org.opensearch.test;
 
-import com.carrotsearch.randomizedtesting.RandomizedRunner;
-import org.junit.runner.RunWith;
+//import com.carrotsearch.randomizedtesting.RandomizedRunner;
+//import org.junit.runner.RunWith;
 
-@RunWith(RandomizedRunner.class)
+//@RunWith(RandomizedRunner.class)
 public class SycamoreCluster extends OpenSearchIntegTestCase {
 
     final TestCluster cluster;
