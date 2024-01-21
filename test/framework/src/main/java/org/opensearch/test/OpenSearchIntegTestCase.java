@@ -373,7 +373,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
      * The current cluster depending on the configured {@link Scope}.
      * By default if no {@link ClusterScope} is configured this will hold a reference to the suite cluster.
      */
-    private static TestCluster currentCluster;
+    protected static TestCluster currentCluster;
     private static RestClient restClient = null;
 
     private static final Map<Class<?>, TestCluster> clusters = new IdentityHashMap<>();
@@ -642,6 +642,10 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
     public static TestCluster cluster() {
         return currentCluster;
     }
+
+    //protected TestCluster getCurrentCluster() {
+    //    return currentCluster;
+    //}
 
     public static boolean isInternalCluster() {
         return (currentCluster instanceof InternalTestCluster);
@@ -1000,7 +1004,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
     ) {
         String color = clusterHealthStatus.name().toLowerCase(Locale.ROOT);
         String method = "ensure" + Strings.capitalize(color);
-
+        System.out.println("c.h. here 1");
         ClusterHealthRequest healthRequest = Requests.clusterHealthRequest(indices)
             .timeout(timeout)
             .waitForStatus(clusterHealthStatus)
@@ -1016,8 +1020,9 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             // shut down. The following "waitForNodes" condition ensures that the node has been removed by the cluster-manager
             // so that the health check applies to the set of nodes we expect to be part of the cluster.
             .waitForNodes(Integer.toString(cluster().size()));
-
+        System.out.println("c.h. here 2.");
         ClusterHealthResponse actionGet = client().admin().cluster().health(healthRequest).actionGet();
+        System.out.println("c.h. here 2.1.");
         if (actionGet.isTimedOut()) {
             final String hotThreads = client().admin()
                 .cluster()
@@ -1029,6 +1034,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
                 .stream()
                 .map(NodeHotThreads::getHotThreads)
                 .collect(Collectors.joining("\n"));
+            System.out.println("c.h. here 3.");
             logger.info(
                 "{} timed out, cluster state:\n{}\npending tasks:\n{}\nhot threads:\n{}\n",
                 method,
@@ -1036,14 +1042,18 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
                 client().admin().cluster().preparePendingClusterTasks().get(),
                 hotThreads
             );
+            System.out.println("c.h. here 4.");
             fail("timed out waiting for " + color + " state");
+            System.out.println("c.h. here 5.");
         }
         assertThat(
             "Expected at least " + clusterHealthStatus + " but got " + actionGet.getStatus(),
             actionGet.getStatus().value(),
             lessThanOrEqualTo(clusterHealthStatus.value())
         );
+        System.out.println("c.h. here 6.");
         logger.debug("indices {} are {}", indices.length == 0 ? "[_all]" : indices, color);
+        System.out.println("c.h. here 7.");
         return actionGet.getStatus();
     }
 
@@ -2110,7 +2120,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             minNumDataNodes = getMinNumDataNodes();
             maxNumDataNodes = getMaxNumDataNodes();
         }
-        Collection<Class<? extends Plugin>> mockPlugins = getMockPlugins();
+        Collection<Class<? extends Plugin>> mockPlugins = new ArrayList<>(); // getMockPlugins();
 
         System.out.println("Here 2.");
         final NodeConfigurationSource nodeConfigurationSource = getNodeConfigSource();
@@ -2127,7 +2137,7 @@ public abstract class OpenSearchIntegTestCase extends OpenSearchTestCase {
             mockPlugins = mocks;
         }
 
-        // mockPlugins.add(MockHttpTransport.TestPlugin.class);
+        mockPlugins.add(MockHttpTransport.TestPlugin.class);
 
         System.out.println("Constructing InternalTestCluster.");
 
